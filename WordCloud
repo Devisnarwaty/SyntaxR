@@ -1,0 +1,13 @@
+library(RColorBrewer)
+library(wordcloud)
+library(tm)
+
+dataTFIDF = read.csv("TFIDFP.csv", header = TRUE)
+jumlahdata = rowSums(dataTFIDF)
+gabTFIDF = data.frame(dataTFIDF, jumlahdata)
+TFIDF = gabTFIDF[which(gabTFIDF$jumlah!=0),-1548] 
+
+a = sort(colSums(TFIDF), decreasing = TRUE)
+b = data.frame(word = names(a), freq=a)
+win.graph()
+wordcloud(words = b$word, freq=b$freq, scale = c(4,0,4), random_color = FALSE, random.order = FALSE, rot.per = 0.25, min_freq = 3, max.words = Inf, colors = brewer.pal(8, "Dark2"))
