@@ -1,0 +1,39 @@
+library(cluster)
+library(dbscan)
+library(fpc)
+
+data_CountVect = read.csv("JNTCV.csv")
+data_TFIDF=read.csv("TFIDFJNT.csv")
+jumlah = rowSums(data_CountVect)
+gabunganCV = data.frame(data_CountVect, jumlah)
+CountVect = gabunganCV[which(gabunganCV$jumlah!=0),-668]
+gabunganTFIDF = data.frame(data_TFIDF, jumlah)
+TFIDF = gabunganTFIDF[which(gabunganTFIDF$jumlah!=0),-668]
+
+#DBSCAN 
+DBSCAN = dbscan::dbscan(TFIDF, eps = 0.2, minPts = 20)
+DBSCAN
+x <- data.frame(TFIDF, DBSCAN$cluster)
+y <- x[which(x$DBSCAN.cluster!=0),]
+n = ncol(y);n
+silcoef <- silhouette(y$DBSCAN.cluster, dist(y[,-668]))
+silcoef
+sil_coef_0.1 <- summary(silcoef)$avg.width
+sil_coef_0.1
+
+#Word Cloud Every Cluster
+library(wordcloud)
+library(RColorBrewer)
+
+dtm = data.frame(CountVect, DBSCAN$cluster)
+
+for (i in 2:46)
+{
+  a = dtm[which(dtm$DBSCAN.cluster==i),-668]
+  b = sort(colSums(a), decreasing = TRUE)
+  c = data.frame(word=names(b), freq=b)
+  win.graph()
+  wordcloud(words = c$word, freq=c$freq, scale = c(4,0,4), random_color = FALSE,
+            random.order = FALSE, rot.per = 0.35, min_freq = 1, max.words = Inf, 
+            colors = brewer.pal(12, "Paired"))
+}
