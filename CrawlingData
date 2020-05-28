@@ -1,0 +1,14 @@
+library(twitteR)
+library(rtweet)
+library(tidyverse)
+library(tm)
+
+create_token (
+app             	= "my_twitter_research_app",
+consumer_key     	= 'your consumer key',
+consumer_secret 	= 'your consumer secret',
+access_token    	= 'your access token',
+access_secret	    = 'your access secret’)
+
+JNE 	<- search_tweets ("JNECare", lang="id", n=15000, tweet_mode="extended", include_rts=FALSE)
+JNECRAWLING <-  data.frame(JNE$created_at, JNE$screen_name, JNE$text, JNE$display_text_width, as.character(JNE$mentions_screen_name))
